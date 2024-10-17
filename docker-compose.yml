@@ -1,0 +1,30 @@
+version: '3'
+services:
+  mongo:
+    image: mongo:3.4.4    # Sử dụng MongoDB image mới nhất
+    container_name: mongo
+    ports:
+      - "27017:27017"       # Mở cổng MongoDB
+    volumes:
+      - mongo_data:/data/db # Gắn volume để lưu dữ liệu MongoDB vĩnh viễn
+    networks:
+      - app-network         # Đặt MongoDB vào cùng mạng với ứng dụng
+
+  app:
+    build: .                # Xây dựng ứng dụng từ Dockerfile hiện tại
+    container_name: web_app
+    ports:
+      - "1337:80"           # Mở cổng ứng dụng web
+    depends_on:
+      - mongo               # Đảm bảo MongoDB khởi động trước khi ứng dụng chạy
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/heros  # Thiết lập biến môi trường kết nối MongoDB
+    networks:
+      - app-network         # Kết nối ứng dụng vào cùng mạng
+
+volumes:
+  mongo_data:
+
+networks:
+  app-network:
+
